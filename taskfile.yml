@@ -8,7 +8,8 @@ tasks:
     desc: "Build the Debian image"
     cmds:
       - docker build --build-arg PASSWORD=$user_password --build-arg USERNAME=$user_name -f ./debian -t debian .
-      - docker run -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --name debian-container debian /bin/bash
+      - docker run --privileged -it -e DISPLAY=$DISPLAY -v "//var/run/docker.sock:/var/run/docker.sock" -p 8080:80 --name debian-container debian /bin/bash
+      # docker run -privileged -t -i jpetazzo/dind
 
   remove:
     desc: "Remove Debian image and containers"
@@ -21,7 +22,7 @@ tasks:
     desc: "Start the Debian container"
     cmds:
       - docker start debian-container
-      - docker attach debian-container
+      - docker exec -it debian-container bash
       # - docker remove debian-container
       # - docker run -it --name debian-container debian /bin/bash
 

@@ -4,6 +4,14 @@ sudo apt-get install -y -q net-tools openssh-client xclip gcc
 if [ ! -d $USRDIR/.ssh ]; then
   mkdir $USRDIR/.ssh;
 fi
+
+sudo apt-get install -y -q curl
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+nvm install node
+npm install -g @go-task/cli
+
 cd $USRDIR/.ssh
 KEYFILENAME="id_rsa"
 if [ ! -f $KEYFILENAME ]; then
@@ -30,6 +38,8 @@ fi
 
 if [ ! -d $USRDIR/.config ]; then
   mkdir $USRDIR/.config && cd $USRDIR/.config
+  git config --global user.email "henry@gmail.com"
+  git config --global user.name "henry@gmail.com"
   git clone ssh://git@github.com/hcrans/nvim.git
   nvim +PlugInstall
 fi
@@ -38,7 +48,10 @@ if [ ! -d $USRDIR/repos ]; then
   git clone ssh://git@github.com/hcrans/meantToLive
   git clone ssh://git@github.com/hcrans/theSound
   git clone ssh://git@github.com/hcrans/beautifulLetdown
+  git clone ssh://git@github.com/hcrans/docker
 fi
+
+sudo apt-get install -y -q tmux
 
 #THIS ISN'T NEEDED WITH WSL
 # sudo apt-get install -y -q fontconfig wget libarchive-tools
@@ -53,12 +66,15 @@ fi
 #sudo apt-get install -y -q fzf 
 
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended
+bash -c "$(curl -fsSL https://get.docker.com get-docker.sh)" --unattended
 
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-nvm install -g node
-npm install -g @go-task/cli
+cd $USRDIR/repos/theSound
+echo -n 'Enter db password: '
+read db_password
+echo -n SQL_PASSWORD=$db_password > .env
+task dropAndCreateDb
+# task installPsql
+# task createAll
 
 cd $USRDIR
 source ~/.bashrc
