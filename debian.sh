@@ -1,5 +1,5 @@
 sudo apt-get update
-sudo apt-get install -y -q net-tools openssh-client xclip gcc
+sudo apt-get install -y -q net-tools openssh-client xclip gcc iputils-ping ripgrep
 if [ ! -d $HOME/.ssh ]; then
   mkdir $HOME/.ssh;
 fi
@@ -18,7 +18,7 @@ npm install -g @go-task/cli
 
 cd $HOME/.ssh
 KEYFILENAME="id_rsa"
-# if [ ! -f $KEYFILENAME ]; then
+if [ ! -f $KEYFILENAME ]; then
   echo $KEYFILENAME
   # ssh-keygen -N "" -f $KEYFILENAME
   eval `ssh-agent`
@@ -27,7 +27,7 @@ KEYFILENAME="id_rsa"
   # cat id_rsa.pub | xclip -sel clip
   # echo 'Public key copied to clipboard. Paste into GitHub.'
   # read -n 1 -s
-# fi
+fi
 BINDIR=/usr/local
 if [ ! -f $BINDIR/bin/nvim ]; then
   wget https://github.com/neovim/neovim/releases/download/v0.10.0/nvim-linux64.tar.gz && 
@@ -74,9 +74,17 @@ cd $HOME/repos/theSound
 echo -n 'Enter db password: '
 read -s db_password
 echo -n SQL_PASSWORD=$db_password > .env
-# task dropAndCreateDb
 task installPsql
-# task createAll
+task createDb
+task createAll
+
+cd $HOME/repos/beautifulLetdown
+task npmI
+mv ../../apiEnv .env
+
+cd $HOME/repos/meantToLive
+task npmI
+mv ../../uiEnv web/.env
 
 cd $HOME/repos
 source ~/.bashrc

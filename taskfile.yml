@@ -24,18 +24,20 @@ tasks:
     desc: "Build the Debian image"
     cmds:
       - docker build --build-arg PASSWORD=$user_password --build-arg USERNAME=$user_name --build-arg SSH="$ssh_cert" -f ./debian -t debian .
-      - docker run --name {{.databaseName}} -e POSTGRES_PASSWORD=$user_password -p 5432:5432 -d postgres
-      - docker run --privileged -it -e DISPLAY=$DISPLAY -v "//var/run/docker.sock:/var/run/docker.sock" -p 8000:8000 -p 3009:3009 --name debian-container debian /bin/bash
+      - docker network create dareyoutomove
+      - docker run --name {{.databaseName}}-container -e POSTGRES_PASSWORD=$user_password -p 5432:5432 --network dareyoutomove -d postgres 
+      - docker run --privileged -it -e DISPLAY=$DISPLAY -v "//var/run/docker.sock:/var/run/docker.sock" -p 8000:8000 -p 3009:3009 --network dareyoutomove --name debian-container debian /bin/bash
 
   remove:
     desc: "Remove Debian image and containers"
     cmds:
       - docker stop debian-container || true
-      - docker stop debian-{{.databaseName}} || true
+      - docker stop {{.databaseName}}-container || true
       - docker remove debian-container || true
-      - docker remove debian-{{.databaseName}} || true
+      - docker remove {{.databaseName}}-container || true
       - docker rmi $(docker images -qf "reference=debian") || true
       - docker rmi $(docker images -qf "reference={{.databaseName}}") || true
+      - docker network remove dareyoutomove || true
 
   run:
     desc: "Start the Debian container"
