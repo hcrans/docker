@@ -2,29 +2,46 @@ version: "3"
 
 dotenv: ['.env']  # Enable loading variables from a .env file
 
+vars:
+  databaseName: "yuppyword"
+  hostName: "localhost"
+  sqlLogin: "postgres"
+  connection: "-h {{.hostName}} -U {{.sqlLogin}}"
+  dbConnection: "{{.connection}} -d {{.databaseName}}"
+  sqlUser: "henry.crans@gmail.com"
+
 tasks:
+
+  startDocker:
+    desc: "Start the docker engine"
+    status:
+      - |
+        docker info
+    cmds:
+      - exec "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe"
 
   build:
     desc: "Build the Debian image"
     cmds:
-      - docker build --build-arg PASSWORD=$user_password --build-arg USERNAME=$user_name -f ./debian -t debian .
-      - docker run --privileged -it -e DISPLAY=$DISPLAY -v "//var/run/docker.sock:/var/run/docker.sock" -p 8080:80 --name debian-container debian /bin/bash
-      # docker run -privileged -t -i jpetazzo/dind
+      - docker build --build-arg PASSWORD=$user_password --build-arg USERNAME=$user_name --build-arg SSH="$ssh_cert" -f ./debian -t debian .
+      - docker run --name {{.databaseName}} -e POSTGRES_PASSWORD=$user_password -p 5432:5432 -d postgres
+      - docker run --privileged -it -e DISPLAY=$DISPLAY -v "//var/run/docker.sock:/var/run/docker.sock" -p 8000:8000 -p 3009:3009 --name debian-container debian /bin/bash
 
   remove:
     desc: "Remove Debian image and containers"
     cmds:
       - docker stop debian-container || true
+      - docker stop debian-{{.databaseName}} || true
       - docker remove debian-container || true
+      - docker remove debian-{{.databaseName}} || true
       - docker rmi $(docker images -qf "reference=debian") || true
+      - docker rmi $(docker images -qf "reference={{.databaseName}}") || true
 
   run:
     desc: "Start the Debian container"
     cmds:
       - docker start debian-container
       - docker exec -it debian-container bash
-      # - docker remove debian-container
-      # - docker run -it --name debian-container debian /bin/bash
 
   full:
     desc: "Delete, Rebuild, and Start the Debian container"

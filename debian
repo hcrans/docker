@@ -2,10 +2,14 @@ FROM debian:latest
 RUN apt-get update && apt-get install -y sudo
 ARG USERNAME=
 ARG PASSWORD=
+ARG SSH=
 RUN adduser --disabled-password --gecos "" $USERNAME \
     && echo "$USERNAME:$PASSWORD" | chpasswd \
     && usermod -aG sudo $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 ADD debian.sh /home/$USERNAME
+EXPOSE 8000
+EXPOSE 3009
 USER $USERNAME
+RUN mkdir /home/$USERNAME/.ssh && cd /home/$USERNAME/.ssh && echo "$SSH" > id_rsa && chmod 700 ../.ssh && chmod 600 id_rsa
 WORKDIR /home/$USERNAME
