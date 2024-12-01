@@ -76,7 +76,7 @@ read -s db_password
 echo -n SQL_PASSWORD=$db_password > .env
 task installPsql
 task createDb
-task createAll
+task createAllTables
 
 cd $HOME/repos/beautifulLetdown
 task npmI
