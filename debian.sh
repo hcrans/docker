@@ -1,5 +1,5 @@
 sudo apt-get update
-sudo apt-get install -y -q net-tools openssh-client xclip gcc iputils-ping ripgrep unzip fd
+sudo apt-get install -y -q net-tools openssh-client xclip gcc iputils-ping ripgrep unzip fd-find
 if [ ! -d $HOME/.ssh ]; then
   mkdir $HOME/.ssh;
 fi
