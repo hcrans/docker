@@ -7,9 +7,8 @@ RUN adduser --disabled-password --gecos "" $USERNAME \
     && echo "$USERNAME:$PASSWORD" | chpasswd \
     && usermod -aG sudo $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-ADD debian.sh /home/$USERNAME
-ADD ../meantToLive/web/.env /home/$USERNAME/uiEnv
-ADD ../beautifulLetdown/.env /home/$USERNAME/apiEnv
-USER $USERNAME
-RUN mkdir /home/$USERNAME/.ssh && cd /home/$USERNAME/.ssh && echo "$SSH" > id_rsa && chmod 700 ../.ssh && chmod 600 id_rsa
 WORKDIR /home/$USERNAME
+COPY debian.sh ./
+COPY apiEnv.local ./
+USER $USERNAME
+RUN mkdir .ssh && cd .ssh && echo "$SSH" > id_rsa && chmod 700 ../.ssh && chmod 600 id_rsa

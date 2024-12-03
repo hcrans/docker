@@ -1,6 +1,6 @@
 version: "3"
 
-dotenv: ['.env']  # Enable loading variables from a .env file
+dotenv: ['.env.local']  # Enable loading variables from a .env file
 
 vars:
   databaseName: "yuppyword"
@@ -23,7 +23,9 @@ tasks:
   build:
     desc: "Build the Debian image"
     cmds:
+      - cp ../beautifulLetdown/.env.local apiEnv.local
       - docker build --build-arg PASSWORD=$user_password --build-arg USERNAME=$user_name --build-arg SSH="$ssh_cert" -f ./debian -t debian .
+      - rm apiEnv.local
       - docker network create dareyoutomove
       - docker run --name {{.databaseName}}-container -e POSTGRES_PASSWORD=$user_password -p 5432:5432 --network dareyoutomove -d postgres 
       - docker run --privileged -it -e DISPLAY=$DISPLAY -v "//var/run/docker.sock:/var/run/docker.sock" -p 8000:8000 -p 3009:3009 --network dareyoutomove --name debian-container debian /bin/bash

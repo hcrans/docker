@@ -1,5 +1,5 @@
 sudo apt-get update
-sudo apt-get install -y -q net-tools openssh-client xclip gcc iputils-ping ripgrep
+sudo apt-get install -y -q net-tools openssh-client xclip gcc iputils-ping ripgrep unzip fd
 if [ ! -d $HOME/.ssh ]; then
   mkdir $HOME/.ssh;
 fi
@@ -80,11 +80,10 @@ task createAllTables
 
 cd $HOME/repos/beautifulLetdown
 task npmI
-mv ../../apiEnv .env
+mv ../../apiEnv.local .env.local
 
 cd $HOME/repos/meantToLive
 task npmI
-mv ../../uiEnv web/.env
 
 cd $HOME/repos
 source ~/.bashrc
