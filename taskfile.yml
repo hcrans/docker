@@ -1,6 +1,8 @@
 version: "3"
 
-dotenv: ['.env.local']  # Enable loading variables from a .env file
+env:
+  ENV: USER_PASSWORD
+dotenv: ['.env']  # Enable loading variables from a .env file
 
 vars:
   databaseName: "yuppyword"
@@ -30,6 +32,11 @@ tasks:
       - docker run --name {{.databaseName}}-container -e POSTGRES_PASSWORD=$user_password -p 5432:5432 --network dareyoutomove -d postgres 
       - docker run --privileged -it -e DISPLAY=$DISPLAY -v "//var/run/docker.sock:/var/run/docker.sock" -p 8000:8000 -p 3009:3009 --network dareyoutomove --name debian-container debian /bin/bash
 
+  buildDb:
+    desc: "Build the Debian image"
+    cmds:
+      - docker run --name {{.databaseName}}-container -e POSTGRES_PASSWORD=$user_password -p 5432:5432 -d postgres 
+
   remove:
     desc: "Remove Debian image and containers"
     cmds:
@@ -51,4 +58,4 @@ tasks:
     desc: "Delete, Rebuild, and Start the Debian container"
     cmds:
       - task: remove
-      - task: build
+      - task: buildDb

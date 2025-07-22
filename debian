@@ -3,6 +3,7 @@ RUN apt-get update && apt-get install -y sudo
 ARG USERNAME=
 ARG PASSWORD=
 ARG SSH=
+RUN echo $USERNAME
 RUN adduser --disabled-password --gecos "" $USERNAME \
     && echo "$USERNAME:$PASSWORD" | chpasswd \
     && usermod -aG sudo $USERNAME \
