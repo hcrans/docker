@@ -53,9 +53,6 @@ tasks:
     cmds:
       - task startDocker
       - docker start {{.databaseName}}-container
-      #-p 5432:5432
-      # - docker start debian-container
-      # - docker exec -it debian-container bash
 
   full:
     desc: "Delete, Rebuild, and Start the Debian container"
